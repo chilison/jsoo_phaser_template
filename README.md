@@ -16,3 +16,9 @@
 Is as usual as for every OCaml project
 
 `opam install ocaml-lsp-server ocamlformat`
+
+#### Useful links
+
+* https://photonstorm.github.io/phaser3-docs/
+* https://ocsigen.org/js_of_ocaml/latest/manual/bindings
+* https://ocsigen.org/js_of_ocaml/latest/manual/ppx

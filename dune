@@ -1,7 +1,7 @@
 (env
  (dev
   (flags
-   (:standard -w -unused-field))))
+   (:standard -w -unused-field -warn-error -unused-value-declaration))))
 
 (executable
  (name server)
