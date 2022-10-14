@@ -9,7 +9,7 @@
 
 #### Building dependencies
 
-`opam install  yojson cohttp lwt websocket-lwt-unix lwt_ppx js_of_ocaml-ppx`
+`opam install  yojson cohttp lwt websocket-lwt-unix lwt_ppx js_of_ocaml-ppx ppx_inline_test --yes`
 
 #### IDE integration
 
