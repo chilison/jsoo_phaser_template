@@ -21,7 +21,7 @@ class type map =
     method createDynamicLayer :
       int -> tileset t -> int -> int -> dynamicLayer t meth
 
-    method getTileAt : int -> int -> int
+    method getTileAt : int -> int -> int meth
     method putTileAt : int -> int -> int -> unit meth
   end
 
@@ -43,6 +43,8 @@ class type loader_plugin =
       js_string t -> js_string t -> spritesheetConfig t -> unit meth
   end
 
+let curr_map : map Js.t ref = ref (Js.Unsafe.js_expr "1")
+
 let dungeon this =
   object%js (that)
     val sprites =
@@ -54,10 +56,10 @@ let dungeon this =
     method initialize () =
       console##log
         ((Js.Unsafe.eval_string {|obj => Object.keys(obj) |} : _ -> _) this);
-      console##log "igxwelugler";
+      console##log "this";
       console##log
         ((Js.Unsafe.eval_string {|obj => Object.keys(obj) |} : _ -> _) that);
-      console##log "ukglcxkryditdji";
+      console##log "that";
       let make : game_object_creator t =
         (Js.Unsafe.eval_string {|x => x.make |} : _ -> _) this
       in
@@ -80,13 +82,16 @@ let dungeon this =
       console##log_2
         (Js.string "current_map_config##.data =  ")
         current_map_config##.data;
-      let (_map : map t) = make##tilemap current_map_config in
+      let (_map2 : map t) = make##tilemap current_map_config in
+      curr_map := _map2;
       let (_tileset : tileset t) =
-        _map##addTilesetImage (Js.string "tiles") (Js.string "tiles") tileSize
-          tileSize 0 1
+        !curr_map##addTilesetImage (Js.string "tiles") (Js.string "tiles")
+          tileSize tileSize 0 1
       in
       console##log_2 (Js.string "_tileset =  ") _tileset;
-      let (ground : dynamicLayer t) = _map##createDynamicLayer 0 _tileset 0 0 in
+      let (ground : dynamicLayer t) =
+        !curr_map##createDynamicLayer 0 _tileset 0 0
+      in
       console##log_2 (Js.string "ground =  ") ground;
       ground
   end

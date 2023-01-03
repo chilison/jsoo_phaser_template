@@ -5,6 +5,9 @@
 open Js_of_ocaml
 open Firebug
 open Js
+open Dungeon
+open TurnManager
+open Player
 
 class type spritesheetConfig =
   object
@@ -19,30 +22,6 @@ class type loader_plugin =
       js_string t -> js_string t -> spritesheetConfig t -> unit meth
   end
 
-class type config_map =
-  object
-    method data : int js_array t js_array t readonly_prop
-    method tileWidth : int readonly_prop
-    method tileHeight : int readonly_prop
-  end
-
-class type tileset = object end
-class type staticLayer = object end
-
-class type map =
-  object
-    method addTilesetImage :
-      js_string t -> js_string t -> int -> int -> int -> int -> tileset t meth
-
-    method createStaticLayer :
-      int -> tileset t -> int -> int -> staticLayer t meth
-  end
-
-class type game_object_creator =
-  object
-    method tilemap : config_map t -> map t meth
-  end
-
 let caml_scene =
   object%js (this)
     method init = ()
@@ -53,6 +32,8 @@ let caml_scene =
       let loader : loader_plugin t =
         (Js.Unsafe.eval_string {|x => x.load |} : _ -> _) this
       in
+      (* Js.Optdef. *)
+      (* assert (Js.Optdef.test (Js.Unsafe.coerce loader)); *)
       console##log_2 (Js.string "load =  ") loader;
 
       let spritesheet_config : spritesheetConfig Js.t =
@@ -70,37 +51,24 @@ let caml_scene =
     method create () =
       Firebug.console##log (Js.string "create");
       console##log_2 (Js.string "self = ") this;
+      let a = (Dungeon.dungeon this)##initialize () in
+      console##log
+        ((Js.Unsafe.eval_string {|obj => Object.keys(obj) |} : _ -> _) this);
+      let player = Player.make_player this 15 15;
+      let entityPlayer : entity Js.t ref = ref (Js.Unsafe.js_expr "1") in
+      a;
 
-      let make : game_object_creator t =
-        (Js.Unsafe.eval_string {|x => x.make |} : _ -> _) this
-      in
-      console##log_2 (Js.string "make =  ") make;
+      (*Entity is expected and player is not compatible with this type. It definitely works somehow in JavaScript version.
+        I suppose, I'll have to get rid of entity type or create player and its entity clone to copy the values ​​of the required fields,
+        it might lead to new errors though*)
+      TurnManager.tm##addEntity !entityPlayer !entityPlayer##.x := player##.x;
+      !entityPlayer##.y := player##.y;
+      !entityPlayer##.movementPoints := player##.movementPoints;
+      !entityPlayer##.sprite := player##.sprite
 
-      let level2 = Level.level2 in
-
-      console##log_2 (Js.string "level =  ") level2;
-
-      let tileSize = 16 in
-
-      let current_map_config : config_map Js.t =
-        object%js (self)
-          val data = level2
-          val tileWidth = 16
-          val tileHeight = 16
-        end
-      in
-      console##log_2
-        (Js.string "current_map_config##.data =  ")
-        current_map_config##.data;
-      let (_map : map t) = make##tilemap current_map_config in
-      let (_tileset : tileset t) =
-        _map##addTilesetImage (Js.string "tiles") (Js.string "tiles") tileSize
-          tileSize 0 1
-      in
-      console##log_2 (Js.string "_tileset =  ") _tileset;
-      let (ground : staticLayer t) = _map##createStaticLayer 0 _tileset 0 0 in
-      console##log_2 (Js.string "ground =  ") ground;
-      ground
+    method update () =
+      if TurnManager.tm##over () == true then TurnManager.tm##refresh ();
+      TurnManager.tm##turn ()
   end
 
 type game
@@ -116,7 +84,7 @@ let config =
     val backgroundColor = Js.string "#000"
     val parent = Js.string "game"
     val pixelArt = Js._true
-    val zoom = 2
+    val zoom = 1
     val scene = caml_scene
 
     val physics =
