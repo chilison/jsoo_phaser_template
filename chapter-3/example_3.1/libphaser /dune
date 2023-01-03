@@ -1,0 +1,16 @@
+(library
+ (name lib1)
+ (modules lib1)
+ (preprocess
+  (pps ppx_inline_test))
+ (inline_tests))
+
+(library
+ (name libphaser)
+ (public_name libphaser)
+ (modules stuff)
+ (libraries js_of_ocaml)
+ (preprocess
+  (pps js_of_ocaml-ppx))
+ ;
+ )
