@@ -7,7 +7,11 @@ open Firebug
 open Js
 open Dungeon
 open TurnManager
-open Player
+
+(* This is a different version of example_3.3 which is more likely to work out.
+   What exactly I did: got rid of entity class, made character class instead, divided make_player and
+   set_player (maybe I`ll have to bring them back together when 'this' problem (lower) is solved), player module
+   is temporarily glued to turnManager module 'cos some cycle relationships suddenly occured. *)
 
 class type spritesheetConfig =
   object
@@ -54,17 +58,16 @@ let caml_scene =
       let a = (Dungeon.dungeon this)##initialize () in
       console##log
         ((Js.Unsafe.eval_string {|obj => Object.keys(obj) |} : _ -> _) this);
-      let player = Player.make_player this 15 15;
-      let entityPlayer : entity Js.t ref = ref (Js.Unsafe.js_expr "1");
-      (*Entity is expected and player is not compatible with this type. It definitely works somehow in JavaScript version.
-        I suppose, I'll have to get rid of entity type or create player and its entity clone to copy the values ​​of the required fields,
-        it might lead to new errors though*)
-      TurnManager.tm##addEntity !entityPlayer !entityPlayer##.x := player##.x;
-      !entityPlayer##.y := player##.y;
-      !entityPlayer##.movementPoints := player##.movementPoints;
-      !entityPlayer##.sprite := player##.sprite;
-      !entityPlayer##.x := player##.x;
-      TurnManager.tm##addEntity !entityPlayer in TurnManager.tm##.entities
+      Firebug.console##log (Js.string "player");
+      let player = new character in
+      player#set_player 15 15;
+      (* I don`t know how to pass 'this' as an argument to the method, i tried to do it another way by
+         making make_player a separate function but then I have no idea how to pass player as an arguement.
+         I left this piece of code as I want it to be.. sooooo it doesn`t work :/*)
+      player#make_player this;
+
+      TurnManager.tm##addEntity player;
+      a
 
     method update () =
       if TurnManager.tm##over () == true then TurnManager.tm##refresh ();
