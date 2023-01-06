@@ -54,15 +54,16 @@ let dungeon this =
       end
 
     method initialize () =
-      console##log
-        ((Js.Unsafe.eval_string {|obj => Object.keys(obj) |} : _ -> _) this);
-      console##log "this";
-      console##log
-        ((Js.Unsafe.eval_string {|obj => Object.keys(obj) |} : _ -> _) that);
-      console##log "that";
+      (* console##log
+           ((Js.Unsafe.eval_string {|obj => Object.keys(obj) |} : _ -> _) this);
+         console##log "this";
+         console##log
+           ((Js.Unsafe.eval_string {|obj => Object.keys(obj) |} : _ -> _) that);
+         console##log "that"; *)
       let make : game_object_creator t =
         (Js.Unsafe.eval_string {|x => x.make |} : _ -> _) this
       in
+
       assert (Js.Optdef.test (Obj.magic make));
       console##log_2 (Js.string "make =  ") make;
 

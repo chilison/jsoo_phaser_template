@@ -33,13 +33,13 @@ let caml_scene =
     method preload =
       Firebug.console##log (Js.string "preload");
       console##log_2 (Js.string "self = ") this;
+
       let loader : loader_plugin t =
         (Js.Unsafe.eval_string {|x => x.load |} : _ -> _) this
       in
       (* Js.Optdef. *)
       (* assert (Js.Optdef.test (Js.Unsafe.coerce loader)); *)
       console##log_2 (Js.string "load =  ") loader;
-
       let spritesheet_config : spritesheetConfig Js.t =
         object%js (self)
           val frameWidth = 16
@@ -60,10 +60,9 @@ let caml_scene =
         ((Js.Unsafe.eval_string {|obj => Object.keys(obj) |} : _ -> _) this);
       Firebug.console##log (Js.string "player");
       let player = new character in
-      player#set_player 15 15;
-      (* I don`t know how to pass 'this' as an argument to the method, i tried to do it another way by
-         making make_player a separate function but then I have no idea how to pass player as an arguement.
-         I left this piece of code as I want it to be.. sooooo it doesn`t work :/*)
+      player#set_player 25 15;
+
+      console##log_2 (Js.string "self = ") this;
       player#make_player this;
 
       TurnManager.tm##addEntity player;
