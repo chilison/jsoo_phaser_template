@@ -10,8 +10,10 @@ open TurnManager
 
 (* This is a different version of example_3.3 which is more likely to work out.
    What exactly I did: got rid of entity class, made character class instead, divided make_player and
-   set_player (maybe I`ll have to bring them back together when 'this' problem (lower) is solved), player module
-   is temporarily glued to turnManager module 'cos some cycle relationships suddenly occured. *)
+   set_player, player module is temporarily glued to turnManager module because some cycle relationships suddenly occured.
+
+   Refresh method in turnManager is not written correctly but surely works. 
+   The main thing done in comparison with previous version is that character stopped walking through the walls. *)
 
 class type spritesheetConfig =
   object

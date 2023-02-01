@@ -13,6 +13,11 @@ class type config_map =
 class type tileset = object end
 class type dynamicLayer = object end
 
+class type tile =
+  object
+    method index : int readonly_prop
+  end
+
 class type map =
   object
     method addTilesetImage :
@@ -21,7 +26,7 @@ class type map =
     method createDynamicLayer :
       int -> tileset t -> int -> int -> dynamicLayer t meth
 
-    method getTileAt : int -> int -> int meth
+    method getTileAt : int -> int -> tile t meth
     method putTileAt : int -> int -> int -> unit meth
   end
 

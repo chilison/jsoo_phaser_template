@@ -77,14 +77,17 @@ class character =
           y <- y + 1;
           stuff##.moved := true);
         if stuff##.moved == true then movementPoints <- movementPoints - 1);
-      (* now player is definitely walking... through the walls... *)
-      let tileAtDestination = Dungeon.(!curr_map)##getTileAt x y in
-      if tileAtDestination == (Dungeon.dungeon self)##.sprites##.wall then (
+      if
+        (Dungeon.dungeon self)##.sprites##.wall
+        == (Dungeon.(!curr_map)##getTileAt x y)##.index
+      then (
         x <- stuff##.oldX;
         y <- stuff##.oldY);
       if x != stuff##.oldX || y != stuff##.oldY then (
         Dungeon.(!curr_map)##putTileAt sprite x y;
-        Dungeon.(!curr_map)##putTileAt 0 stuff##.oldX stuff##.oldY)
+        Dungeon.(!curr_map)##putTileAt
+          (Dungeon.dungeon self)##.sprites##.floor
+          stuff##.oldX stuff##.oldY)
   end
 
 module Entity = struct

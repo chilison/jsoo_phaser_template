@@ -3,7 +3,7 @@
   (flags
    (:standard
     -warn-error
-    -33-27
+    -33-27-34
     -w
     -unused-field
     -warn-error
@@ -19,7 +19,7 @@
 
 (executable
  (name client)
- (modules client turnManager level dungeon)
+ (modules level turnManager dungeon client)
  (modes js)
  (libraries libphaser)
  (preprocess
