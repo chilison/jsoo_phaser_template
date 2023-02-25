@@ -113,8 +113,8 @@ let tm =
 
     method removeEntity entity = SS.remove entity this##.entities
 
-    (* method refresh () = SS.iter (for x -> refreshChar ()) this##.entities *)
-    method refresh () = (SS.choose this##.entities)#refreshChar ()
+    method refresh () = SS.iter (fun x -> x#refreshChar ()) this##.entities
+    (* method refresh () = (SS.choose this##.entities)#refreshChar () *)
     (* method refresh () =
        this##.entities :=
          SS.filter (fun x -> SS.mem x this##.entities == false) this##.entities *)
