@@ -7,6 +7,7 @@ open Firebug
 open Js
 open Dungeon
 open TurnManager
+open Monster
 
 class type spritesheetConfig =
   object
@@ -55,12 +56,15 @@ let caml_scene =
         ((Js.Unsafe.eval_string {|obj => Object.keys(obj) |} : _ -> _) this);
       Firebug.console##log (Js.string "player");
       let player = new Player.character in
-      player#set_player 25 15;
+      player#set 15 15;
+      player#make this;
 
-      console##log_2 (Js.string "self = ") this;
-      player#make_player this;
+      let monster = new Monster.basicMonster in
+      monster#set 70 8;
+      monster#make this;
 
       TurnManager.tm##addEntity player;
+      TurnManager.tm##addEntity monster;
       a
 
     method update () =

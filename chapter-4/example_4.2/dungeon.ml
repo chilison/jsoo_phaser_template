@@ -113,11 +113,12 @@ let dungeon this =
       console##log_2 (Js.string "ground =  ") ground;
       ground
 
-    (* не могу разобраться как брать элемент массива массивов, ждет какой-то #js_array t *)
     method isWalkableTile x y =
-      (* let curr_level : int js_array t js_array t ref = ref level2 in
-         array_get (array_get !curr_level x) y != 554 *)
-      true
+      let ( let* ) = Optdef.bind in
+      let* arr = array_get level2 y in
+      let* axy = array_get arr x in
+      Optdef.return (axy <> 554)
+    (* `TODO: get rid of optedef /???? *)
 
     method initializeEntity : 'a. 'a -> unit =
       fun this ->
@@ -129,27 +130,30 @@ let dungeon this =
         this##.sprite := add##sprite x y (Js.string "tiles") this##.tile;
         this##.sprite##setOrigin 0
 
-    method moveEntityTo : 'a. 'a -> x -> y -> unit =
-      fun this ->
-        this##.moving := true;
+    method moveEntityTo : 'a. 'a -> int -> int -> unit =
+      fun entity xx yy ->
+        entity##.moving := true;
 
+        console##log_2 (Js.string "im here") entity##.sprite;
+
+        let tweens : tween_manager t =
+          (Js.Unsafe.eval_string {|x => x.add |} : _ -> _) this
+        in
         let tween_builder_config : tweenBuilderConfig Js.t =
           object%js
-            val targets = this##.sprite
+            val targets : int = 29
 
-            method onComplete x y =
-              this##.moving := false;
-              this##.x := x;
-              this##.y := y
+            method onComplete xx yy =
+              entity##.moving := false;
+              entity##.x := xx;
+              entity##.y := yy
 
-            val x = !curr_map##tileToWorldX this##.x
-            val y = !curr_map##tileToWorldX this##.y
+            val x = !curr_map##tileToWorldX xx
+            val y = !curr_map##tileToWorldX yy
             val ease = Js.string "Power2"
             val duration = 200
           end
         in
-        let tweens : tween_manager t =
-          (Js.Unsafe.eval_string {|x => x.load |} : _ -> _) this
-        in
+        console##log_2 (Js.string "twc") tween_builder_config;
         tweens##add tween_builder_config
   end

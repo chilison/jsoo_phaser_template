@@ -19,7 +19,7 @@
 
 (executable
  (name client)
- (modules level turnManager dungeon client)
+ (modules level turnManager dungeon player client monster entity)
  (modes js)
  (libraries libphaser)
  (preprocess

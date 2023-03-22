@@ -2,6 +2,7 @@ open Js_of_ocaml
 open Firebug
 open Js
 open Dungeon
+open Entity
 
 class type key =
   object
@@ -26,35 +27,15 @@ class type input_plugin =
     method keyboard : keyboard_creator t prop
   end
 
-class type sprite =
-  object
-    method tint : int prop
-  end
-
 let cursors : cursor_keys Js.t ref = ref (Js.Unsafe.js_expr "1")
-let spr : sprite Js.t ref = ref (Js.Unsafe.js_expr "1")
 
 class character =
   object (self)
-    val mutable x : int = 0
-    val mutable y : int = 0
-    val mutable movementPoints : int = 1
-    val mutable tile : int = 29
+    inherit entity
     val mutable hp : int = 10
-    val mutable moving : bool = false
-    val mutable sprite : sprite Js.t ref = spr
     val mutable cursor : cursor_keys Js.t ref = cursors
-    method refreshChar () = movementPoints <- 1
-    method get_x = x
-    method get_y = y
-    method get_tile = tile
-    method overChar () = movementPoints == 0
 
-    method set_player newX newY =
-      x <- newX;
-      y <- newY
-
-    method make_player : 'a. 'a -> unit =
+    method! make : 'a. 'a -> unit =
       fun this ->
         let input : input_plugin t =
           (Js.Unsafe.eval_string {|x => x.input |} : _ -> _) this
@@ -65,7 +46,7 @@ class character =
         cursor <- cursors;
         Dungeon.(!curr_map)##putTileAt tile x y
 
-    method turnChar () =
+    method! turn =
       let stuff =
         object%js
           val mutable moved : bool = false
@@ -88,11 +69,19 @@ class character =
           stuff##.moved := true);
         if stuff##.moved == true then (
           movementPoints <- movementPoints - 1;
-          if (Dungeon.dungeon self)##isWalkableTile stuff##.newX stuff##.newY
+          if
+            (Dungeon.dungeon self)##isWalkableTile stuff##.newX stuff##.newY
+            == Optdef.return true
           then
-            (* передаем тип со значениями, а ожидается с методами. не работает, получается *)
-            (Dungeon.dungeon self)##moveEntityTo self stuff##.newX stuff##.newY));
-
+            (Dungeon.dungeon self)##moveEntityTo
+              (object%js
+                 val mutable x : int = self#get_x
+                 val mutable y : int = self#get_y
+                 val mutable moving : bool = self#get_moving
+                 val mutable sprite : int = self#get_sprite
+              end)
+              stuff##.newX stuff##.newY;
+          stuff##.moved := true));
       if hp <= 3 then
         !sprite##.tint :=
           Js.Unsafe.global##._Phaser##._Display##._Color##_GetColor 255 0 0
