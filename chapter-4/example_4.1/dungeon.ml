@@ -36,14 +36,13 @@ class type sprite =
   object
     method tint : int prop
     method no : int prop
+    method setOrigin : float -> unit meth
   end
-
-
 
 class type game_object_creator =
   object
     method tilemap : config_map t -> map t meth
-    method sprite : int -> int -> js_string t -> tile t -> sprite meth
+    method sprite : int -> int -> js_string t -> int -> sprite t meth
   end
 
 class type spritesheetConfig =
@@ -61,8 +60,8 @@ class type loader_plugin =
 
 class type tweenBuilderConfig =
   object
-    method targets : int readonly_prop
-    method onComplete : int -> int -> unit meth
+    method targets : sprite t readonly_prop
+    method onComplete : unit meth
     method x : int readonly_prop
     method y : int readonly_prop
     method ease : js_string t readonly_prop
@@ -76,8 +75,7 @@ class type tween_manager =
 
 let curr_map : map Js.t ref = ref (Js.Unsafe.js_expr "1")
 
-
-let dungeon this =
+let dungeon twist =
   object%js (that)
     val sprites =
       object%js
@@ -89,9 +87,8 @@ let dungeon this =
 
     method initialize () =
       let make : game_object_creator t =
-        (Js.Unsafe.eval_string {|x => x.make |} : _ -> _) this
+        (Js.Unsafe.eval_string {|x => x.make |} : _ -> _) twist
       in
-
       assert (Js.Optdef.test (Obj.magic make));
       console##log_2 (Js.string "make =  ") make;
 
@@ -127,35 +124,35 @@ let dungeon this =
       let* arr = array_get level2 y in
       let* axy = array_get arr x in
       Optdef.return (axy <> 554)
+
     (* `TODO: get rid of optedef /???? *)
 
-    method initializeEntity : 'a. 'a -> unit =
-      fun this ->
-        let add : game_object_creator t =
-          (Js.Unsafe.eval_string {|x => x.add |} : _ -> _) this
-        in
-        let x = !curr_map##tileToWorldX this##.x in
-        let y = !curr_map##tileToWorldX this##.y in
-        this##.sprite := add##sprite x y (Js.string "tiles") this##.tile;
-        this##.sprite##setOrigin 0
+    (* method initializeEntity : 'a. 'a -> unit =
+       fun this ->
+         let add : game_object_creator t =
+           (Js.Unsafe.eval_string {|x => x.add |} : _ -> _) this
+         in
 
-    method moveEntityTo : 'a. 'a -> int -> int -> unit =
-      fun entity xx yy ->
-        entity##.moving := true;
-        
-        console##log_2 (Js.string "im here") entity##.sprite;
-        
+         let x = !curr_map##tileToWorldX this##.x in
+         let y = !curr_map##tileToWorldX this##.y in
+         this##.sprite := add##sprite x y (Js.string "tiles") this##.tile;
+         console##log (Js.string "in initializeEntity");
+         this##.sprite##setOrigin 0 *)
+
+    method moveEntityTo : 'a 'b. twist -> 'b -> int -> int -> unit =
+      fun twist entity xx yy ->
+        entity#set_moving true;
         let tweens : tween_manager t =
-          (Js.Unsafe.eval_string {|x => x.add |} : _ -> _) this
+          (Js.Unsafe.eval_string {|x => x.tweens |} : _ -> _) twist
         in
         let tween_builder_config : tweenBuilderConfig Js.t =
           object%js
-            val targets : int = 29
+            val targets : sprite t = entity#get_sprite
 
-            method onComplete xx yy=
-              entity##.moving := false;
-              entity##.x := xx;
-              entity##.y := yy
+            method onComplete =
+              entity#set_moving false;
+              entity#set_x xx;
+              entity#set_y yy
 
             val x = !curr_map##tileToWorldX xx
             val y = !curr_map##tileToWorldX yy
@@ -163,9 +160,5 @@ let dungeon this =
             val duration = 200
           end
         in
-        console##log_2 (Js.string "twc") tween_builder_config; 
         tweens##add tween_builder_config
   end
-
-
-

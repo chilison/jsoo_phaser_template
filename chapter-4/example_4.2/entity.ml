@@ -3,12 +3,15 @@ open Firebug
 open Js
 
 class type sprite =
-  object
-    method tint : int prop
-    method no : int prop
-  end
+object
+  method tint : int prop
+  method no : int prop
+  method setOrigin : float -> unit meth
+end
 
-let spr : sprite Js.t ref = ref (Js.Unsafe.js_expr "1")
+  let spr : sprite Js.t ref = ref (Js.Unsafe.js_expr "2")
+
+class type twist = object end
 
 class entity =
   object (self)
@@ -17,18 +20,18 @@ class entity =
     val mutable movementPoints : int = 1
     val mutable tile : int = 29
     val mutable moving : bool = false
-    val mutable sprite : sprite Js.t ref = spr
-    method refresh () = movementPoints <- 1
-    method over () = movementPoints == 0 && moving == false
+    val mutable sprite : sprite Js.t  = !spr
+    method refreshChar () = movementPoints <- 1
+    method overChar () = movementPoints == 0 && moving == false
     method get_x = x
+    method set_x : int -> unit = fun xx -> x <- xx
     method get_y = y
+    method set_y : int -> unit = fun yy -> y <- yy
     method get_tile = tile
     method get_moving = moving
-    method get_sprite = 10
-    method turn = ()
-    method make : 'a. 'a -> unit = fun this -> console##log (Js.string "hoo;f")
-
-    method set newX newY =
-      x <- newX;
-      y <- newY
+    method set_moving : bool -> unit = fun mov -> moving <- mov
+    method get_sprite = sprite
+    method turnChar : twist t -> unit = fun twist -> ()
+    method make : 'a. 'a -> int -> int -> unit =
+      fun this newX newY -> ()
   end
