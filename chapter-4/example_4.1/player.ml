@@ -38,7 +38,7 @@ class character =
     val mutable movementPoints : int = 1
     val mutable tile : int = 29
     val mutable hp : int = 10
-    val mutable moving : bool = false
+    val mutable moving : bool = true
     val mutable sprite : sprite Js.t = !spr
     method get_sprite = sprite
     val mutable cursor : cursor_keys Js.t ref = cursors
@@ -47,7 +47,6 @@ class character =
     method set_x : int -> unit = fun xx -> x <- xx
     method set_y : int -> unit = fun yy -> y <- yy
     method get_y = y
-    method get_moving = moving
     method set_moving : bool -> unit = fun mov -> moving <- mov
     method overChar () = movementPoints == 0 && moving == false
 
@@ -76,7 +75,6 @@ class character =
 
     method turnChar : twist t -> unit =
       fun twist ->
-        (* console##log (Js.string @@ Printf.sprintf "%s %d" __FILE__ __LINE__); *)
         let stuff =
           object%js
             val mutable moved : bool = false
@@ -101,7 +99,7 @@ class character =
             movementPoints <- movementPoints - 1;
             if
               (Dungeon.dungeon self)##isWalkableTile stuff##.newX stuff##.newY
-              == Optdef.return true
+              == true
             then
               (Dungeon.dungeon self)##moveEntityTo
                 twist self stuff##.newX stuff##.newY));

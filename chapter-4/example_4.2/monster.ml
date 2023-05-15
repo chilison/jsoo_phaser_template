@@ -81,37 +81,27 @@ class basicMonster =
       let make_grid : (int js_array t js_array t -> grid Js.t) Js.constr =
         Js.Unsafe.global##._PF##._Grid
       in
-      let stuff1 =
-        object%js
-          val mutable oldX : int = x
-          val mutable oldY : int = y
-        end
+      let oldX : int = x in let oldY : int = y
+      
       in
       if movementPoints > 0 then (
-        let stuff2 =
-          object%js
-            val mutable pX : int = !(Dungeon.player_character)#get_x
-            val mutable pY : int = !(Dungeon.player_character)#get_y
-          end
+        let  pX : int = !(Dungeon.player_character)#get_x
+    in let pY : int = !(Dungeon.player_character)#get_y
+          
         in
-        let stuff3 =
-          object%js
-            val mutable grid = new%js make_grid Level.level2
-            val mutable finder = new%js make_starfinder ()
-          end
+        let grid = new%js make_grid Level.level2
+      in let finder = new%js make_starfinder ()
         in
-        let stuff4 = 
-          object%js
-            val mutable path =
-              stuff3##.finder##findPath
-                stuff1##.oldX stuff1##.oldY stuff2##.pX stuff2##.pY
-                stuff3##.grid
-          end
+        let path =
+              finder##findPath
+                oldX oldY pX pY
+                grid
+        
         in
-        if stuff4##.path##.length > 2 then 
+        if path##.length > 2 then 
           (Dungeon.dungeon self)##moveEntityTo
             twist self
-            (path_get stuff4##.path 1 0) (path_get stuff4##.path 1 1);
+            (path_get path 1 0) (path_get path 1 1);
           movementPoints <- movementPoints - 1)
         
   end

@@ -1,0 +1,48 @@
+(env
+ (dev
+  (js_of_ocaml
+   (compilation_mode whole_program)
+   (flags --debug-info --source-map --pretty --no-inline))
+  (flags
+   (:standard
+    -warn-error
+    -33-27-34
+    -g
+    -w
+    -unused-field
+    -warn-error
+    -unused-value-declaration))))
+
+(executable
+ (name server)
+ (modules ws server)
+ (modes native)
+ (libraries yojson cohttp lwt websocket-lwt-unix)
+ (preprocess
+  (pps ppx_inline_test lwt_ppx)))
+
+(executable
+ (name client)
+ (modules level turnManager dungeon player client monster entity)
+ (modes js)
+ (libraries libphaser)
+ (preprocess
+  (pps ppx_inline_test js_of_ocaml-ppx)))
+
+(alias
+ (name default)
+ (deps
+  ./server.exe
+  client.bc.js
+  index.html
+  (glob_files assets/font/*)
+  (glob_files assets/*)
+  ;
+  ))
+
+(cram
+ (deps
+  server.exe
+  ./client.bc.js
+  ;
+  ))

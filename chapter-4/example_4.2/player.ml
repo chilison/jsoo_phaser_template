@@ -37,10 +37,7 @@ class character =
     inherit Entity.entity
     val mutable hp : int = 10
     
-   
     val mutable cursor : cursor_keys Js.t ref = cursors
-    
-
 
     method! make : 'a. 'a -> int -> int -> unit =
       fun this newX newY ->
@@ -91,7 +88,7 @@ class character =
             movementPoints <- movementPoints - 1;
             if
               (Dungeon.dungeon self)##isWalkableTile stuff##.newX stuff##.newY
-              == Optdef.return true
+              == true
             then 
             (Dungeon.dungeon self)##moveEntityTo
               twist self stuff##.newX stuff##.newY));

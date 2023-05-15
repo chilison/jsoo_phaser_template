@@ -33,9 +33,6 @@ let caml_scene =
       let loader : loader_plugin t =
         (Js.Unsafe.eval_string {|x => x.load |} : _ -> _) this
       in
-      (* Js.Optdef. *)
-      (* assert (Js.Optdef.test (Js.Unsafe.coerce loader)); *)
-      console##log_2 (Js.string "load =  ") loader;
       let spritesheet_config : spritesheetConfig Js.t =
         object%js
           val frameWidth = 16

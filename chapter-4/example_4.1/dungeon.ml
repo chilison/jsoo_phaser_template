@@ -120,12 +120,8 @@ let dungeon twist =
       ground
 
     method isWalkableTile x y =
-      let ( let* ) = Optdef.bind in
-      let* arr = array_get level2 y in
-      let* axy = array_get arr x in
-      Optdef.return (axy <> 554)
-
-    (* `TODO: get rid of optedef /???? *)
+      let tileAtDestination = !(curr_map)##getTileAt x y in
+      tileAtDestination##.index <> 554
 
     (* method initializeEntity : 'a. 'a -> unit =
        fun this ->

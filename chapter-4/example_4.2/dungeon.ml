@@ -91,13 +91,10 @@ let dungeon twist =
       let make : game_object_creator t =
         (Js.Unsafe.eval_string {|x => x.make |} : _ -> _) twist
       in
-      assert (Js.Optdef.test (Obj.magic make));
       console##log_2 (Js.string "make =  ") make;
 
-      let level2 = Level.level2 in
-
-      console##log_2 (Js.string "level =  ") level2;
-
+      let level2 = Level.level2 
+      in
       let current_map_config : config_map Js.t =
         object%js (self)
           val data = level2
@@ -105,16 +102,12 @@ let dungeon twist =
           val tileHeight = that##.tileSize
         end
       in
-      console##log_2
-        (Js.string "current_map_config##.data =  ")
-        current_map_config##.data;
       let (_map2 : map t) = make##tilemap current_map_config in
       curr_map := _map2;
       let (_tileset : tileset t) =
         !curr_map##addTilesetImage (Js.string "tiles") (Js.string "tiles")
           that##.tileSize that##.tileSize 0 1
       in
-      console##log_2 (Js.string "_tileset =  ") _tileset;
       let (ground : dynamicLayer t) =
         !curr_map##createDynamicLayer 0 _tileset 0 0
       in
@@ -122,12 +115,8 @@ let dungeon twist =
       ground
 
     method isWalkableTile x y =
-      let ( let* ) = Optdef.bind in
-      let* arr = array_get level2 y in
-      let* axy = array_get arr x in
-      Optdef.return (axy <> 554)
-
-    (* `TODO: get rid of optedef /???? *)
+      let tileAtDestination = !(curr_map)##getTileAt x y in
+      tileAtDestination##.index <> 554
 
     (* method initializeEntity : 'a. 'a -> unit =
        fun this ->
