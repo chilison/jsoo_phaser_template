@@ -101,7 +101,6 @@ let dungeon twist =
       end
 
     val tileSize = 16
-    val player_character : entity ref = ref (Js.Unsafe.js_expr "2")
 
     method initialize () =
       let make : game_object_creator t =

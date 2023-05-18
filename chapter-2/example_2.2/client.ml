@@ -11,8 +11,16 @@ class type loader_plugin =
     method bitmapFont : js_string t -> js_string t -> js_string t -> unit meth
   end
 
+class type game_object =
+object
+  method destroy : unit -> unit meth
+  (* method active : bool prop
+  method visible : bool prop *)
+end
+
 class type bitmap_text =
   object
+  inherit game_object
     method x : int prop
     method y : int prop
     method font : string prop
@@ -59,11 +67,11 @@ let caml_scene =
 
     method update () =
       Firebug.console##log (Js.string "Update");
-      console##log_2 (Js.string "self = ") this;
 
       !helloText##.x := !helloText##.x + 10;
-
-      if !helloText##.x > 1000 then !helloText##.x := -200
+      
+      if !helloText##.x > 600 then (!helloText##.x := 0; console##log (Js.string "helloText moved"));
+        if !helloText##.x == 0 then (!helloText##destroy (); console##log (Js.string "helloText dead"))
   end
 
 type game
