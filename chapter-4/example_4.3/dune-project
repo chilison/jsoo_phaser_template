@@ -2,9 +2,9 @@
 
 (cram enable)
 
-(name libphaser)
+(name libgame)
 
 (package
- (name libphaser)
+ (name libgame)
  (synopsis "Bindings to Javascript Phaser")
  (depends ppx_inline_test js_of_ocaml-ppx))

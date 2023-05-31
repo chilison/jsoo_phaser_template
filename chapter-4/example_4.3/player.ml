@@ -1,31 +1,9 @@
 open Js_of_ocaml
-open Firebug
 open Js
 open Dungeon
 open Entity
+open Libgame.Phaser_bindings
 
-class type key =
-  object
-    method isDown : bool prop
-  end
-
-class type cursor_keys =
-  object
-    method up : key t prop
-    method down : key t prop
-    method right : key t prop
-    method left : key t prop
-  end
-
-class type keyboard_creator =
-  object
-    method createCursorKeys : unit -> cursor_keys t meth
-  end
-
-class type input_plugin =
-  object
-    method keyboard : keyboard_creator t prop
-  end
 
 let cursors : cursor_keys Js.t ref = ref (Js.Unsafe.js_expr "1")
 let spr : sprite Js.t ref = ref (Js.Unsafe.js_expr "2")

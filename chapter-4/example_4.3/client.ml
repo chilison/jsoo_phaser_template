@@ -1,24 +1,8 @@
 open Js_of_ocaml
-open Firebug
 open Js
-open Dungeon
-open TurnManager
-open Player
+open Libgame.Phaser_bindings
 
 class type twist = object end
-
-class type spritesheetConfig =
-  object
-    method frameWidth : int readonly_prop
-    method frameHeight : int readonly_prop
-    method spacing : int readonly_prop
-  end
-
-class type loader_plugin =
-  object
-    method spritesheet :
-      js_string t -> js_string t -> spritesheetConfig t -> unit meth
-  end
 
 let caml_scene =
   object%js (this)
@@ -47,7 +31,7 @@ let caml_scene =
       player#make this 15 15;
 
       Dungeon.player_character := player;
-
+      
       let monster_1 = new Monster.basicMonster in
       monster_1#make this 15 20;
       let monster_2 = new Monster.basicMonster in

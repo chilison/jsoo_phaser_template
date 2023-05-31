@@ -1,30 +1,14 @@
 open Js_of_ocaml
 open Firebug
 open Js
+open Libgame.Phaser_bindings
 
-class type game_object =
-  object 
-    method destroy : unit -> unit meth
-    method active : bool prop
-    method visible : bool prop
-  end
-
-class type sprite =
-  object
-  inherit game_object
-    method x : int prop
-    method y : int prop
-    method tint : int prop
-    method no : int prop
-    method setOrigin : float -> unit meth
-  end
-
-let spr : sprite Js.t ref = ref (Js.Unsafe.js_expr "1")
+let spr : sprite t ref = ref (Js.Unsafe.js_expr "1")
 
 class type twist = object end
 
 class entity =
-  object (self)
+  object 
     val mutable name : string = ""
     val mutable x : int = 0
     val mutable y : int = 0

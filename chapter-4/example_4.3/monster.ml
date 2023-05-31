@@ -3,42 +3,8 @@ open Js
 open Firebug
 open Entity
 open Dungeon
-
-type grid
-
-class type path =
-  object
-    method length : int prop
-    
-  end
-
-class type finder =
-  object
-    method findPath : int -> int -> int -> int -> grid t -> path t meth
-  end
-  
-class type key =
-  object
-    method isDown : bool prop
-  end
-
-class type cursor_keys =
-  object
-    method up : key t prop
-    method down : key t prop
-    method right : key t prop
-    method left : key t prop
-  end
-
-class type keyboard_creator =
-  object
-    method createCursorKeys : unit -> cursor_keys t meth
-  end
-
-class type input_plugin =
-  object
-    method keyboard : keyboard_creator t prop
-  end
+open Libgame.Phaser_bindings
+open Libgame.Pathfinding_bindings
 
 let cursors : cursor_keys Js.t ref = ref (Js.Unsafe.js_expr "1")
 
@@ -94,7 +60,7 @@ class basicMonster =
 
             let grid = new%js make_grid Level.level2 
             in
-            let  finder = new%js make_starfinder ()
+            let finder = new%js make_starfinder ()
             in
             let path = finder##findPath oldX oldY pX pY grid
             in

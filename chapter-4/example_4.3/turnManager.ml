@@ -1,7 +1,7 @@
 open Js_of_ocaml
 open Firebug
 open Js
-open Entity
+
 
 module Entity = struct
   type t = Entity.entity

@@ -1,91 +1,11 @@
 open Js_of_ocaml
-open Firebug
 open Js
 open Level
 open Entity
 open TurnManager
+open Libgame.Phaser_bindings
+open Libgame.Pathfinding_bindings
 
-type grid
-
-class type path =
-  object
-    method length : int prop
-    
-  end
-
-class type finder =
-  object
-    method findPath : int -> int -> int -> int -> grid t -> path t meth
-  end
-
-class type config_map =
-  object
-    method data : int js_array t js_array t readonly_prop
-    method tileWidth : int readonly_prop
-    method tileHeight : int readonly_prop
-  end
-
-class type tileset = object end
-class type dynamicLayer = object end
-
-class type tile =
-  object
-    method index : int readonly_prop
-  end
-
-class type map =
-  object
-    method addTilesetImage :
-      js_string t -> js_string t -> int -> int -> int -> int -> tileset t meth
-
-    method createDynamicLayer :
-      int -> tileset t -> int -> int -> dynamicLayer t meth
-
-    method getTileAt : int -> int -> tile t meth
-    method putTileAt : int -> int -> int -> unit meth
-    method tileToWorldX : int -> int meth
-    method tileToWorldY : int -> int meth
-  end
-
-class type game_object_creator =
-  object
-    method tilemap : config_map t -> map t meth
-    method sprite : int -> int -> js_string t -> int -> sprite t meth
-  end
-
-class type spritesheetConfig =
-  object
-    method frameWidth : int readonly_prop
-    method frameHeight : int readonly_prop
-    method spacing : int readonly_prop
-  end
-
-class type loader_plugin =
-  object
-    method spritesheet :
-      js_string t -> js_string t -> spritesheetConfig t -> unit meth
-  end
-
-class type tweensBuilderConfig =
-  object
-    method targets : sprite t readonly_prop
-    method onComplete  :  (unit -> unit) readonly_prop
-    method x : int readonly_prop
-    method y : int readonly_prop
-    method ease : js_string t readonly_prop
-    method duration : int readonly_prop
-    method hold : int readonly_prop
-    method delay : int readonly_prop
-    method yoyo : bool readonly_prop
-  end
-
-class type tween_manager =
-  object
-    method add : tweensBuilderConfig t -> unit meth
-  end
-
-let logf fmt = 
-  Format.kasprintf (fun s ->  Firebug.console##log (Js.string s)) fmt
 let curr_map : map Js.t ref = ref (Js.Unsafe.js_expr "1")
 let player_character : entity ref = ref (Js.Unsafe.js_expr "2")
 
@@ -101,7 +21,7 @@ let dungeon twist =
       end
 
     val tileSize = 16
-
+    
     method initialize () =
       let make : game_object_creator t =
         (Js.Unsafe.eval_string {|x => x.make |} : _ -> _) twist
@@ -129,7 +49,7 @@ let dungeon twist =
     method isWalkableTile : int -> int -> bool =
       fun x y ->
       let allEntities = TurnManager.tm##.entities in
-            let flag : bool = SS.fold (fun ent flag  -> if (ent#get_x == x && ent#get_y == y || flag == false) then false else true) allEntities true in 
+        let flag : bool = SS.fold (fun ent flag  -> if (ent#get_x == x && ent#get_y == y || flag == false) then false else true) allEntities true in 
             if flag = false then false else
       let tileAtDestination = !(curr_map)##getTileAt x y in
       tileAtDestination##.index <> that##.sprites##.wall
@@ -213,9 +133,9 @@ let dungeon twist =
                 
                 let damage = attacker#attack  in
                 victim#set_healthPoints (victim#get_healthPoints - damage); 
-                (* console##log_8 attacker#get_name (Js.string " does ") damage (Js.string " damage to ") victim#get_name (Js.string " which now has ") victim#get_healthPoints (Js.string " life left "); *)
                 if victim#get_healthPoints <= 0 then (
                   that##removeEntity victim;
+                  (*another way to delete the entity the memory is leaking though*)
                   (* victim#get_sprite##.active := false;
                   victim#get_sprite##.visible := false *)
                 )
@@ -229,8 +149,6 @@ let dungeon twist =
               val yoyo = true
             end
           in
-          tweens##add tweens_builder_config
-              
-              
+          tweens##add tweens_builder_config          
   end
 

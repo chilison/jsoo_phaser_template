@@ -25,7 +25,7 @@
  (name client)
  (modules level turnManager dungeon player client monster entity)
  (modes js)
- (libraries libphaser)
+ (libraries libgame)
  (preprocess
   (pps ppx_inline_test js_of_ocaml-ppx)))
 

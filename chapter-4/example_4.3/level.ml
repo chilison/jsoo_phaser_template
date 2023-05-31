@@ -1,6 +1,4 @@
 open Js_of_ocaml
-open Firebug
-open Js
 
 [@@@ocamlformat "disable"]
 

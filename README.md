@@ -1,3 +1,6 @@
+#### OCaml version of the game described in Rogulike Development with JavaScript by Andre Alves Garzia
+
+
 #### Client/server js_of_ocaml example
 
 

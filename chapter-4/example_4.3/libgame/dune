@@ -6,9 +6,9 @@
  (inline_tests))
 
 (library
- (name libphaser)
- (public_name libphaser)
- (modules stuff)
+ (name libgame)
+ (public_name libgame)
+ (modules phaser_bindings pathfinding_bindings)
  (libraries js_of_ocaml)
  (preprocess
   (pps js_of_ocaml-ppx))
